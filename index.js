@@ -20,7 +20,7 @@ var connection = mysql.createConnection({
 
     // Your password
     password: "wJfGSO1F0hzx",
-    database: "greatBay_DB"
+    database: "employeeTracker_DB"
 });
 
 //easy way to separate lines, without having to worry about reformatting the text for template literals

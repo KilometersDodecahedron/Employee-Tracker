@@ -4,6 +4,48 @@ const openingMenu = require("./index");
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 
+//global variables used to hold the data called from the database
+var departmentList = [];
+
+const addRole = () => {
+    openingMenu.connection.query("SELECT * FROM departments", (err, res) => {
+        if(err) throw err;
+        console.log(res);
+    });
+    // inquirer.prompt([
+
+    // ]).then(answers => {
+
+    // })
+}
+
+//called by addDepartment() upon completion
+const departmentFinished = () => {
+    openingMenu.makeNewLine();
+    //asks if they want to add another department, a different data type, or go back to the main menu
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "What would you like to do now?",
+            name: "decision",
+            choices: ["Add another Department", "Add a different Data Type", "Return to the Main Menu"]
+        }
+        ]).then(answer => {
+            openingMenu.makeNewLine();
+            switch(answer.decision){
+                case "Add another Department":
+                    addDepartment();
+                    break;
+                case "Add a different Data Type":
+                    addData();
+                    break;
+                case "Return to the Main Menu":
+                    openingMenu.openingMenu();
+                    break;
+            }
+        });
+}
+
 //called by addData()
 const addDepartment = () => {
     inquirer.prompt([
@@ -13,7 +55,20 @@ const addDepartment = () => {
             name: "name"
         }
     ]).then(answer => {
-
+        if(answer.name.length > 0){
+            openingMenu.connection.query("INSERT INTO departments SET ?",
+            {
+                name: answer.name
+            },
+            (err, res) => {
+                if(err) throw err;
+                console.log("New Department Created!");
+                departmentFinished();
+            });
+        }else{
+            console.log("No name detected");
+            departmentFinished();
+        }
     });
 }
 
@@ -75,6 +130,7 @@ const addData = () => {
             case "Add a Department":
                 openingMenu.makeNewLine();
                 //TODO
+                addDepartment();
                 break;
             case "Add a Role":
                 openingMenu.makeNewLine();
