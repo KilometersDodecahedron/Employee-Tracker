@@ -1,7 +1,10 @@
-const viewData = require("./addDataEntries");
+const addData = require("./addDataEntries");
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
+
+//make sure the welcome message only plays at the start
+var loaded = false;
 
 //put in a new line by adding this as a template literal
 const newLine = `\n-------------------------------`;
@@ -37,8 +40,14 @@ const endConnection = () => {
 //run at the start, and after each action is complete to return to the opening menu
 const openingMenu = () => {
     makeNewLine();
-    console.log(`Welcome to the Golden Child Employee Tracker!`);
-    makeNewLine();
+
+    //prints a welcome message when the program starts
+    if(!loaded){
+        console.log(`Welcome to the Golden Child Employee Tracker!`);
+        makeNewLine();
+        loaded = true;
+    }
+    
     inquirer.prompt([
         {
             type: "list",
@@ -50,10 +59,13 @@ const openingMenu = () => {
         console.log(answer.action);
         switch(answer.action){
             case "View Existing Entries":
+                //TODO
                 break;
             case "Enter New Information":
+                addData.addData();
                 break;
             case "Update Employee Roles":
+                //TODO
                 break;
             case "Exit Golden Child Employee Tracker":
                 endConnection();
@@ -65,12 +77,16 @@ const openingMenu = () => {
     });
 }
 
-module.exports = openingMenu;
-module.exports = newLine;
+//lets other scripts navigate back to the start menu
+module.exports.openingMenu = openingMenu;
+//this is just a useful formatting tool
+module.exports.makeNewLine = makeNewLine;
+//allow other scripts to access the server
+module.exports.connection = connection;
 
 connection.connect(function(err) {
     if (err) throw err;
     // console.log("connected as id " + connection.threadId + "\n");
-    viewData.viewData();
     openingMenu();
 });
+
