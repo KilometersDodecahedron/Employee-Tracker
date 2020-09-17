@@ -4,19 +4,58 @@ const openingMenu = require("./index");
 const inquirer = require("inquirer");
 const mysql = require("mysql");
 
-//global variables used to hold the data called from the database
-var departmentList = [];
-
 const addRole = () => {
+    //stores the name and ID of the departments
+    let departmentList = [];
+    let departmentId = [];
+
     openingMenu.connection.query("SELECT * FROM departments", (err, res) => {
         if(err) throw err;
-        console.log(res);
+
+        //adds the data from the response to the arrays for functions 
+        res.forEach(element => {
+            departmentList.push(element.name);
+            departmentId.push(element.id);
+        });
+
+        inquirer.prompt([
+            {
+                //name
+                type: "input",
+                message: "Enter the Name of the role",
+                name: "title"
+            },
+            {
+                //salary
+                type: "number",
+                message: "Enter the Salary of the role",
+                name: "salary"
+            },
+            {
+                //department
+                type: "list",
+                message: "What department is the Role in?",
+                name: "department",
+                choices: departmentList
+            }
+        ]).then(answers => {
+            //gets the id of the deparment to put into the table as a Foreign Key
+            let id = departmentId[departmentList.indexOf(answers.department)];
+            
+            let newRole = {
+                title: answers.title,
+                salary: answers.salary,
+                department_id: id
+            };
+            
+            openingMenu.connection.query("INSERT INTO roles SET ?", newRole,
+            (err, res) => {
+                //TODO ask if they want to add more
+                if(err) throw err;
+                addData();
+            }) 
+        })
     });
-    // inquirer.prompt([
-
-    // ]).then(answers => {
-
-    // })
 }
 
 //called by addDepartment() upon completion
@@ -121,6 +160,7 @@ const addData = () => {
             choices: ["Add a New Employee", "Add a Department", "Add a Role", "Back to Main Menu"]
         }
     ]).then(answer => {
+        //pick which data type they want to enter
         switch(answer.dataType){
             case "Add a New Employee":
                 openingMenu.makeNewLine();
@@ -129,12 +169,12 @@ const addData = () => {
                 break;
             case "Add a Department":
                 openingMenu.makeNewLine();
-                //TODO
                 addDepartment();
                 break;
             case "Add a Role":
                 openingMenu.makeNewLine();
-                //TODO
+                //TODO finish addRole()
+                addRole();
                 break;
             case "Back to Main Menu":
                 openingMenu.openingMenu();

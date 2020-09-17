@@ -1,5 +1,5 @@
 DROP DATABASE IF EXISTS employeeTracker_DB;
-CREATE DATABASE employeeTracker_DB;
+CREATE DATABASE employeeTracker_DBdepartments;
 USE employeeTracker_DB;
 
 CREATE TABLE departments (
@@ -13,7 +13,8 @@ CREATE TABLE roles (
     title VARCHAR(100) NOT NULL,
     salary DECIMAL(10, 2) NOT NULL,
     department_id INT NOT NULL,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (department_id) REFERENCES departments (id)
 );
 
 CREATE TABLE employees (
@@ -22,5 +23,7 @@ CREATE TABLE employees (
     last_name VARCHAR(100) NOT NULL,
     role_id INT NOT NULL,
     manager_id INT,
-    PRIMARY KEY (id)
+    PRIMARY KEY (id),
+    FOREIGN KEY (role_id) REFERENCES roles (id),
+    FOREIGN KEY (manager_id) REFERENCES employees (id)
 );
