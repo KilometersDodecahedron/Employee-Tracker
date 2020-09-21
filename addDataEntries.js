@@ -62,6 +62,7 @@ const addRole = () => {
             (err, res) => {
                 //TODO ask if they want to add more
                 if(err) throw err;
+                console.log(`The ${answers.title} Role (Salary: ${answers.salary}, Department: ${answers.department}) has been Added`);
                 dataEntryFinished("role");
             }) 
         })
@@ -163,7 +164,7 @@ const addDepartment = () => {
             },
             (err, res) => {
                 if(err) throw err;
-                console.log("New Department Created!");
+                console.log(`The ${answer.name} Department has been Created!`);
                 dataEntryFinished("department");
             });
         }else{
@@ -284,6 +285,7 @@ const addEmployee = () => {
             },
             (err, res) => {
                 if(err) throw err;
+                console.log(`${answers.firstName + " " + answers.lastName} (Role: ${answers.role}, Manager: ${answers.manager}) is now an Employee!`);
                 dataEntryFinished("employee");
             });
         });
