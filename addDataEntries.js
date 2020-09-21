@@ -33,11 +33,20 @@ const addRole = () => {
                 name: "salary"
             },
             {
+                type: "confirm",
+                message: "Is this role part of an official Deparment?",
+                name: "hasDepartment",
+                when: () => {return departmentList.length > 0;}
+            },
+            {
                 //department
                 type: "list",
-                message: "What department is the Role in?",
+                message: "What Department is the Role in?",
                 name: "department",
-                choices: departmentList
+                choices: departmentList,
+                when: questions => {
+                    return questions.hasDepartment;
+                }
             }
         ]).then(answers => {
             //gets the id of the deparment to put into the table as a Foreign Key
@@ -138,8 +147,6 @@ const dataEntryFinished = (typeOfData) => {
  
 }
 
-
-
 //called by addData()
 const addDepartment = () => {
     inquirer.prompt([
@@ -225,35 +232,60 @@ const addEmployee = () => {
                 //ask if role
                 type: "confirm",
                 message: "Does this employee have an official Role?",
-                name: "hasRole"
+                name: "hasRole",
+                when: () => {return roleList.length > 0}
             },
             {
                 //give role if asked
                 type: "list",
+                message: "What role do they have?",
+                name: "role",
+                choices: roleList,
                 when: questions => {
                     return questions.hasRole;
                 }
             },
             {
                 //ask if manager
+                type: "confirm",
+                message: "Does this employee have a Manager?",
+                name: "hasManager",
+                when: () => {return employeeList.length > 0}
             },
             {
                 //give manager if asked
+                type: "list",
+                message: "Who is their manager?",
+                name: "manager",
+                choices: employeeList,
+                when: questions => {
+                    return questions.hasManager;
+                }
             }
         ]).then(answers => {
+            //set defaults to 'null' in case they didn't pick something
+            var idOfManager = null;
+            var idOfRole = null;
+
+            //sets the variables to the chosen values, if they were selected
+            if(answers.hasManager){
+                idOfManager = employeeIds[employeeList.indexOf(answers.manager)];
+            }
+            if(answers.hasRole){
+                idOfRole = roleId[roleList.indexOf(answers.role)];
+            } 
+
             openingMenu.connection.query("INSERT INTO employees SET ?",
             {
-                // first_name: answers.firstName,
-                // last_name: answers.lastName,
-    
-                //TODO create way to access Foreign Keys
-    
+                first_name: answers.firstName,
+                last_name: answers.lastName,
+                role_id: idOfRole,
+                manager_id: idOfManager
             },
             (err, res) => {
-    
+                if(err) throw err;
+                dataEntryFinished("employee");
             });
-            console.log(answers);
-            dataEntryFinished("employee");
         });
     });
 }
