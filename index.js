@@ -1,4 +1,5 @@
 const addData = require("./addDataEntries");
+const viewData = require("./viewDataEntries");
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
@@ -60,6 +61,7 @@ const openingMenu = () => {
         switch(answer.action){
             case "View Existing Entries":
                 //TODO
+                viewData.viewData();
                 break;
             case "Enter New Information":
                 addData.addData();

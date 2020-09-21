@@ -2,7 +2,6 @@
 const openingMenu = require("./index");
 
 const inquirer = require("inquirer");
-const mysql = require("mysql");
 
 //called by addData()
 const addRole = () => {
