@@ -306,7 +306,6 @@ const addData = () => {
         switch(answer.dataType){
             case "Add a New Employee":
                 openingMenu.makeNewLine();
-                //TODO finish addEmployee()
                 addEmployee();
                 break;
             case "Add a Department":
@@ -315,7 +314,6 @@ const addData = () => {
                 break;
             case "Add a Role":
                 openingMenu.makeNewLine();
-                //TODO finish addRole()
                 addRole();
                 break;
             case "Back to Main Menu":
