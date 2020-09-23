@@ -1,5 +1,6 @@
 const addData = require("./addDataEntries");
 const viewData = require("./viewDataEntries");
+const updateData = require("./updateDataEntries");
 
 const inquirer = require("inquirer");
 const mysql = require("mysql");
@@ -60,7 +61,6 @@ const openingMenu = () => {
         console.log(answer.action);
         switch(answer.action){
             case "View Existing Entries":
-                //TODO
                 viewData.viewData();
                 break;
             case "Enter New Information":
@@ -68,6 +68,7 @@ const openingMenu = () => {
                 break;
             case "Update Employee Roles":
                 //TODO
+                updateData.updateData();
                 break;
             case "Exit Golden Child Employee Tracker":
                 endConnection();
@@ -88,7 +89,10 @@ module.exports.connection = connection;
 
 connection.connect(function(err) {
     if (err) throw err;
-    // console.log("connected as id " + connection.threadId + "\n");
-    openingMenu();
+    // make sure it's using the right database
+    connection.query("USE employeeTracker_DB", (err) => {
+        if (err) throw err;
+        openingMenu();
+    }); 
 });
 

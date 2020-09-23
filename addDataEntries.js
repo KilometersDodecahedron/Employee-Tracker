@@ -144,7 +144,6 @@ const dataEntryFinished = (typeOfData) => {
                 });
             break;
     }
- 
 }
 
 //called by addData()
