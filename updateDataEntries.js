@@ -83,7 +83,6 @@ const updateDepartment = () => {
             switch(answers.decision){
                 case "Rename Department":
                     openingMenu.makeNewLine();
-                    //TODO
                     openingMenu.connection.query("UPDATE departments SET name = ? WHERE name = ?", [answers.newName, answers.department], (err, data) => {
                         if(err) throw err;
                         console.log(`The ${answers.department} Department has been renamed the ${answers.newName} Department`);
@@ -92,7 +91,11 @@ const updateDepartment = () => {
                     break;
                 case "Delete Department":
                     openingMenu.makeNewLine();
-                    //TODO
+                    openingMenu.connection.query("DELETE FROM departments WHERE name = ?", [answers.department], (err, data) => {
+                        if(err) throw err;
+                        console.log(`The ${answers.department} Department has been Deleted`);
+                        dataUpdateFinished("department");
+                    });
                     break;
                 case "Update a Different Data Type":
                     updateData();
