@@ -228,7 +228,6 @@ const viewEmployees = () => {
                         });
                         break;
                 }
-
             });
         });
     });

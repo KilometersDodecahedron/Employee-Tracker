@@ -19,10 +19,10 @@ const updateData = () => {
             case "Employees":
                 openingMenu.makeNewLine();
                 //TODO
+                updateEmployees();
                 break;
             case "Roles":
                 openingMenu.makeNewLine();
-                //TODO
                 updateRoles();
                 break;
             case "Deparments":
@@ -86,14 +86,116 @@ const preformTheRoleUpdate = (rolesObject, query, callback) => {
     })
 }
 
-const askHowToSearchEmployees = () => {
-    //inquirer.prompt
+//called as promise after inquire of updateEmployees
+const processEmployeeUpdate = (answers) => {
+    //figure out which search it needs
+    return new Promise((resolve, reject) => {
+        switch(answers.search){
+            case "No, show me All Employees":
+                openingMenu.makeNewLine();
+                openingMenu.connection.query("SELECT * FROM employees", (err, data) => {
+                    if(err) throw err;
+
+                    var employeeName = [];
+                    var employeeIds = [];
+
+                    data.forEach(object => {
+                        employeeName.push(object.first_name + " " + object.last_name);
+                        employeeIds.push(object.id);
+                    });
+
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            message: "Select the Employee",
+                            name: "employee",
+                            choices: employeeName
+                        }
+                    ]).then(answer => {
+                        //answer.employee == employeeIds[employeeName.indexOf(answer.employee)]
+                        let holderObject = {
+                            fullName: answer.employee,
+                            id: employeeIds[employeeName.indexOf(answer.employee)]
+                        }
+                        resolve(holderObject);
+                    });
+                })
+                break;
+            case "Search Employees by Role":
+                openingMenu.makeNewLine();
+                break;
+            case "Search Employees by Manager":
+                openingMenu.makeNewLine();
+                break;
+        }
+    });
 }
 
 const updateEmployees = () => {
-    // inquirer.prompt([
+    inquirer.prompt([
+        {
+            type: "list",
+            message: "Any Employees in particular?",
+            name: "search",
+            choices: ["No, show me All Employees", "Search Employees by Role", "Search Employees by Manager", "Update a Different Datatype"]
+        },
+        {
+            type: "list",
+            message: "How would you like to Update Employees?",
+            name: "decision",
+            choices: ["Change Role", "Change Manager", "Delete Employee"],
+            when: questions => {
+                return questions.search != "Update a Different Datatype";
+            }
+        }
+    ]).then(answers => {
+        //returns to the main update branch if they chose to update a different datatype 
+        if(answers.search == "Update a Different Datatype"){
+            updateData();
+        }else{
+            openingMenu.makeNewLine();
+            processEmployeeUpdate(answers).then(resolve => {
+                switch(answers.decision){
+                    case "Change Role":
+                        openingMenu.makeNewLine();
+                        //roles
+                        openingMenu.connection.query("SELECT * FROM roles", (err, data) => {
+                            var roleTitles = [];
+                            var roleIds = [];
 
-    // ])
+                            data.forEach(object => {
+                                roleTitles.push(object.title);
+                                roleIds.push(object.id);
+                            })
+
+                            inquirer.prompt([
+                                {
+                                    type: "list",
+                                    message: `Select the New Role for ${resolve.fullName}`,
+                                    name: "newRole",
+                                    choices: roleTitles
+                                }
+                            ]).then(answer => {
+                                openingMenu.connection.query("UPDATE employees SET role_id = ? WHERE id = ?", 
+                                    [roleIds[roleTitles.indexOf(answer.newRole)], resolve.id], (err, res) => {
+                                        if(err) throw err;
+                                        openingMenu.makeNewLine();
+                                        console.log(`${resolve.fullName} has been reassigned to ${answer.newRole}`);
+                                        updateEmployees();
+                                    });
+                            });
+                        });
+                        break;
+                    case "Change Manager":
+                        openingMenu.makeNewLine();
+                        break;
+                    case "Delete Employee":
+                        openingMenu.makeNewLine();
+                        break;
+                }
+            });
+        }
+    });
 }
 
 const updateRoles = () => {
@@ -205,7 +307,7 @@ const constructQuery = (answers) => {
                     data.forEach(object => {
                         depNames.push(object.name);
                         depIds.push(object.id);
-                    })
+                    });
 
                     inquirer.prompt([
                         //ask wi=hich depatment

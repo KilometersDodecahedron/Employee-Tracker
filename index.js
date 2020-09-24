@@ -95,4 +95,3 @@ connection.connect(function(err) {
         openingMenu();
     }); 
 });
-
