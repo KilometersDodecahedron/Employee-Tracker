@@ -233,4 +233,6 @@ const viewEmployees = () => {
     });
 }
 
+//accessed by updateDataEntries
+module.exports.selfJoinQuery = selfJoinQuery;
 module.exports.viewData = viewData;

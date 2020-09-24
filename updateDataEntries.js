@@ -1,5 +1,6 @@
 //access Main Menu functions
 const openingMenu = require("./index");
+const viewData = require("./viewDataEntries"); 
 
 const inquirer = require("inquirer");
 
@@ -157,6 +158,28 @@ const processEmployeeUpdate = (answers) => {
                 break;
             case "Search Employees by Manager":
                 openingMenu.makeNewLine();
+                openingMenu.connection.query(viewData.selfJoinQuery, (err, managers) => {
+                    var managerList = [];
+                    var managerIds = [];
+                    managers.forEach(object => {
+                        managerList.push(object.manager_firstName + " " + object.manager_lastName);
+                        managerIds.push(object.id);
+                    });
+
+                    inquirer.prompt([
+                        {
+                            type: "list",
+                            message: "Select the Manager to search by",
+                            name: "manager",
+                            choices: managerList
+                        }
+                    ]).then(answer => {
+                        let setQuery = "SELECT * FROM employees WHERE manager_id = " + managerIds[managerList.indexOf(answer.manager)];
+                        getEmployeeDataObject(setQuery).then(res => {
+                            resolve(res);
+                        });
+                    })
+                });
                 break;
         }
     });
