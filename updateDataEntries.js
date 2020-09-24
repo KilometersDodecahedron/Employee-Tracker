@@ -235,6 +235,7 @@ const updateEmployees = () => {
                                         if(err) throw err;
                                         openingMenu.makeNewLine();
                                         console.log(`${resolve.fullName} has been reassigned to ${answer.newRole}`);
+                                        openingMenu.makeNewLine();
                                         updateEmployees();
                                     });
                             });
@@ -242,9 +243,42 @@ const updateEmployees = () => {
                         break;
                     case "Change Manager":
                         openingMenu.makeNewLine();
+                        openingMenu.connection.query("SELECT * FROM employees", (err, managers) => {
+                            var managerList = [];
+                            var managerIds = [];
+                            managers.forEach(object => {
+                                managerList.push(object.first_name + " " + object.last_name);
+                                managerIds.push(object.id);
+                            });
+
+                            inquirer.prompt([
+                                {
+                                    type: "list",
+                                    message: `Select the New Manager for ${resolve.fullName}`,
+                                    name: "newManager",
+                                    choices: managerList
+                                }
+                            ]).then(answer => {
+                                openingMenu.connection.query("UPDATE employees SET manager_id = ? WHERE id = ?", 
+                                    [managerIds[managerList.indexOf(answer.newManager)], resolve.id], (err) => {
+                                        if(err) throw err;
+                                        openingMenu.makeNewLine();
+                                        console.log(`${resolve.fullName} has a New Manager: ${answer.newManager}`);
+                                        openingMenu.makeNewLine();
+                                        updateEmployees();
+                                    });
+                            });
+                        });
                         break;
                     case "Delete Employee":
                         openingMenu.makeNewLine();
+                        openingMenu.connection.query("DELETE FROM employees WHERE id = ?", [resolve.id], (err) => {
+                            if(err) throw err;
+                                openingMenu.makeNewLine();
+                                console.log(`The enrty for ${resolve.fullName} has been Deleted`);
+                                openingMenu.makeNewLine();
+                                updateEmployees();
+                            })
                         break;
                 }
             });
