@@ -55,7 +55,7 @@ const openingMenu = () => {
             type: "list",
             message: "What would you like to do?",
             name: "action",
-            choices: ["View Existing Entries", "Enter New Information", "Update Employee Roles", "Exit Golden Child Employee Tracker"]
+            choices: ["View Existing Entries", "Enter New Information", "Update Data", "Exit Golden Child Employee Tracker"]
         }
     ]).then(answer => {
         console.log(answer.action);
@@ -66,7 +66,7 @@ const openingMenu = () => {
             case "Enter New Information":
                 addData.addData();
                 break;
-            case "Update Employee Roles":
+            case "Update Data":
                 //TODO
                 updateData.updateData();
                 break;
