@@ -86,6 +86,38 @@ const preformTheRoleUpdate = (rolesObject, query, callback) => {
     })
 }
 
+//called by processEmployeeUpdate
+const getEmployeeDataObject = (queryPhrase) => {
+    return new Promise ((resolve, reject) => {
+        openingMenu.connection.query(queryPhrase, (err, data) => {
+            if(err) throw err;
+
+            var employeeName = [];
+            var employeeIds = [];
+
+            data.forEach(object => {
+                employeeName.push(object.first_name + " " + object.last_name);
+                employeeIds.push(object.id);
+            });
+
+            inquirer.prompt([
+                {
+                    type: "list",
+                    message: "Select the Employee",
+                    name: "employee",
+                    choices: employeeName
+                }
+            ]).then(answer => {
+                let holderObject = {
+                    fullName: answer.employee,
+                    id: employeeIds[employeeName.indexOf(answer.employee)]
+                }
+                resolve(holderObject);
+            });
+        });
+    });
+}
+
 //called as promise after inquire of updateEmployees
 const processEmployeeUpdate = (answers) => {
     //figure out which search it needs
@@ -93,36 +125,35 @@ const processEmployeeUpdate = (answers) => {
         switch(answers.search){
             case "No, show me All Employees":
                 openingMenu.makeNewLine();
-                openingMenu.connection.query("SELECT * FROM employees", (err, data) => {
-                    if(err) throw err;
-
-                    var employeeName = [];
-                    var employeeIds = [];
+                getEmployeeDataObject("SELECT * FROM employees").then(res => {
+                    resolve(res);
+                });
+                break;
+            case "Search Employees by Role":
+                openingMenu.makeNewLine();
+                openingMenu.connection.query("SELECT * FROM roles", (err, data) => {
+                    var roleTitles = [];
+                    var roleIds = [];
 
                     data.forEach(object => {
-                        employeeName.push(object.first_name + " " + object.last_name);
-                        employeeIds.push(object.id);
+                        roleTitles.push(object.title);
+                        roleIds.push(object.id);
                     });
 
                     inquirer.prompt([
                         {
                             type: "list",
-                            message: "Select the Employee",
-                            name: "employee",
-                            choices: employeeName
+                            message: `Select the Role to search Employees by`,
+                            name: "role",
+                            choices: roleTitles
                         }
                     ]).then(answer => {
-                        //answer.employee == employeeIds[employeeName.indexOf(answer.employee)]
-                        let holderObject = {
-                            fullName: answer.employee,
-                            id: employeeIds[employeeName.indexOf(answer.employee)]
-                        }
-                        resolve(holderObject);
+                        let setQuery = "SELECT * FROM employees WHERE role_id = " + roleIds[roleTitles.indexOf(answer.role)];
+                        getEmployeeDataObject(setQuery).then(res => {
+                            resolve(res);
+                        });
                     });
-                })
-                break;
-            case "Search Employees by Role":
-                openingMenu.makeNewLine();
+                });
                 break;
             case "Search Employees by Manager":
                 openingMenu.makeNewLine();
@@ -166,7 +197,7 @@ const updateEmployees = () => {
                             data.forEach(object => {
                                 roleTitles.push(object.title);
                                 roleIds.push(object.id);
-                            })
+                            });
 
                             inquirer.prompt([
                                 {
