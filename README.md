@@ -2,6 +2,8 @@
 
 ## This node-based command-line application is designed to allow you to better keep track of your business structure. You can View, Create, Update, and Delete lists of Deparments, Roles, and Employees
 
+[Click Here to Watch A Tutorial](https://www.youtube.com/watch?v=ZGkva1f8srE&feature=youtu.be)
+
 Start by navigating to the app's main directory in the console, and run "node index.js"
 
 ![node index.js](./screenshots/01-node.png)
